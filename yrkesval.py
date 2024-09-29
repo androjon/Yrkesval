@@ -78,21 +78,30 @@ with col2:
     exclude_titles = st.toggle("jobbtitlar", value = False)
 
 valid_options_dict = {}
+type_sorted_valid_options_list = []
 
 if exclude_field == False:
     valid_options_dict = valid_options_dict | options_field
+    sorted_field = sorted(list(options_field.keys()))
+    type_sorted_valid_options_list.extend(sorted_field)
 if exclude_groups == False:
     valid_options_dict = valid_options_dict | options_ssyk_level_4
+    sorted_groups = sorted(list(options_ssyk_level_4.keys()))
+    type_sorted_valid_options_list.extend(sorted_groups)
 if exclude_occupations == False:
     valid_options_dict = valid_options_dict | options_occupations
+    sorted_occupations = sorted(list(options_occupations.keys()))
+    type_sorted_valid_options_list.extend(sorted_occupations)
 if exclude_titles == False:
     valid_options_dict = valid_options_dict | options_titles
+    sorted_titles = sorted(list(options_titles.keys()))
+    type_sorted_valid_options_list.extend(sorted_titles)
 
 valid_options_list = sorted(list(valid_options_dict.keys()))
 
 selected_option = st.selectbox(
     "Välj ett yrke/område som du tidigare har arbetat som/inom",
-    (valid_options_list), placeholder = "", index = None)
+    (type_sorted_valid_options_list), placeholder = "", index = None)
 
 if selected_option:
     id_selected_option = valid_options_dict.get(selected_option)
