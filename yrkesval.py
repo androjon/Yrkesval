@@ -70,7 +70,7 @@ data_occupations = import_occupationdata()
 options_all, options_field, options_ssyk_level_4, options_occupations, options_titles = import_options(data_occupations)
 
 descriptions = import_data("id_definitions.json")
-taxonomy_connections = import_data("taxonomibegrepp_yrke_utifrån_esco.json")
+taxonomy_connections = import_data("taxonomy.json")
 
 st.write("Välj nedan om du vill exkludera något från den översta rullistan")
 
