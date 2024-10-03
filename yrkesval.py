@@ -24,33 +24,39 @@ def import_options(input):
     return options_all, options_field, options_ssyk_level_4, options_occupations, options_titles
 
 @st.cache_data
-def show_info_selected(fields, groups, occupation, title, description):
-    with st.sidebar:
-        PIPE = "│"
-        ELBOW = "└──"
-        SHORT_ELBOW = "└─"
-        LONG_ELBOW = "    └──"
-        TEE = "├──"
-        PIPE_PREFIX = "│   "
-        SPACE_PREFIX = "&nbsp;&nbsp;&nbsp;&nbsp;"
-        strings = []
-        if fields:
-            strings.append(fields)
-        if groups:
-            group_str = SHORT_ELBOW + groups
-            strings.append(group_str)
-        if occupation:
-            occupations_str = SPACE_PREFIX + SHORT_ELBOW + occupation
-            strings.append(occupations_str)
-        if title:
-            title_str = SPACE_PREFIX + SPACE_PREFIX + SHORT_ELBOW + title
-            strings.append(title_str)
-        string = "<br />".join(strings)
-        tree = f"<p style='font-size:8px;'>{string}</p>"
-        st.markdown(tree, unsafe_allow_html=True)
+def show_info_selected(fields, groups, occupation, title, description, taxonomy):
+    #with st.sidebar:
+    PIPE = "│"
+    ELBOW = "└──"
+    SHORT_ELBOW = "└─"
+    LONG_ELBOW = "    └──"
+    TEE = "├──"
+    PIPE_PREFIX = "│   "
+    SPACE_PREFIX = "&nbsp;&nbsp;&nbsp;&nbsp;"
+    strings = []
+    if fields:
+        strings.append(fields)
+    if groups:
+        group_str = SHORT_ELBOW + groups
+        strings.append(group_str)
+    if occupation:
+        occupations_str = SPACE_PREFIX + SHORT_ELBOW + occupation
+        strings.append(occupations_str)
+    if title:
+        title_str = SPACE_PREFIX + SPACE_PREFIX + SHORT_ELBOW + title
+        strings.append(title_str)
+    string = "<br />".join(strings)
+    tree = f"<p style='font-size:12px;'>{string}</p>"
+    st.markdown(tree, unsafe_allow_html=True)
 
-        text = f"<p style='font-size:12px;'>{description}</p>"
-        st.markdown(text, unsafe_allow_html=True)
+    text = f"<p style='font-size:12px;'>{description}</p>"
+    st.markdown(text, unsafe_allow_html=True)
+
+    if taxonomy:
+        taxonomy_text = taxonomy[0:5]
+        taxonomy_text_string = "<br />".join(taxonomy_text)
+        taxonomy_text = f"<p style='font-size:12px;'>Efterfrågade kompetenser:<br />{taxonomy_text_string}</p>"
+        st.markdown(taxonomy_text, unsafe_allow_html=True)
 
 st.logo("af-logotyp-rgb-540px.jpg")
 
@@ -64,6 +70,7 @@ data_occupations = import_occupationdata()
 options_all, options_field, options_ssyk_level_4, options_occupations, options_titles = import_options(data_occupations)
 
 descriptions = import_data("id_definitions.json")
+taxonomy_connections = import_data("taxonomibegrepp_yrke_utifrån_esco.json")
 
 st.write("Välj nedan om du vill exkludera något från den översta rullistan")
 
@@ -118,7 +125,7 @@ if selected_option:
 
     if type_selected_option == "yrkesområde":
         description = descriptions.get(id_selected_option)
-        show_info_selected(data_occupations[id_selected_option].showname, None, None, None, description)
+        show_info_selected(data_occupations[id_selected_option].showname, None, None, None, description, None)
         valid_group_names_dict = {}
         for g in related_group_names:
             valid_group_names_dict[data_occupations[g].name] = g
@@ -130,7 +137,7 @@ if selected_option:
         if selected_option_below_field:
             id_selected_group = valid_group_names_dict.get(selected_option_below_field)
             description = descriptions.get(id_selected_group)
-            show_info_selected(data_occupations[id_selected_option].showname, data_occupations[id_selected_group].showname, None, None, description)
+            show_info_selected(data_occupations[id_selected_option].showname, data_occupations[id_selected_group].showname, None, None, description, None)
             related_occupation_names = data_occupations[id_selected_group].related_occupation
             valid_occupation_names_dict = {}
             for g in related_occupation_names:
@@ -143,7 +150,8 @@ if selected_option:
             if selected_option_below_group:
                 id_selected_option_below_group = valid_occupation_names_dict.get(selected_option_below_group)
                 description = descriptions.get(id_selected_option_below_group)
-                show_info_selected(data_occupations[id_selected_option].showname, data_occupations[id_selected_group].showname, data_occupations[id_selected_option_below_group].showname, None, description)
+                related_taxonomy = taxonomy_connections.get(id_selected_option_below_group)
+                show_info_selected(data_occupations[id_selected_option].showname, data_occupations[id_selected_group].showname, data_occupations[id_selected_option_below_group].showname, None, description, related_taxonomy)
     
     elif type_selected_option == "yrkesgrupp":
         name = data_occupations[id_selected_option].showname
@@ -151,9 +159,9 @@ if selected_option:
         related_fields_names = []
         for f in related_fields:
             related_fields_names.append(data_occupations[f].showname)
-        related_fields_str = " & ".join(related_fields_names)
+        related_fields_str = "<br />".join(related_fields_names)
         description = descriptions.get(id_selected_option)
-        show_info_selected(related_fields_str, name, None, None, description)
+        show_info_selected(related_fields_str, name, None, None, description, None)
 
         valid_occupation_names_dict = {}
         for g in related_occupation_names:
@@ -170,14 +178,15 @@ if selected_option:
             related_fields_names = []
             for f in related_fields:
                 related_fields_names.append(data_occupations[f].showname)
-            related_fields_str = " & ".join(related_fields_names)
+            related_fields_str = "<br />".join(related_fields_names)
             related_groups = data_occupations[id].related_occupation_groups
             related_groups_names = []
             for g in related_groups:
                 related_groups_names.append(data_occupations[g].showname)
-            related_groups_str = " & ".join(related_groups_names)
+            related_groups_str = "<br />".join(related_groups_names)
             description = descriptions.get(id)
-            show_info_selected(related_fields_str, related_groups_str, name, None, description)
+            related_taxonomy = taxonomy_connections.get(id)
+            show_info_selected(related_fields_str, related_groups_str, name, None, description, related_taxonomy)
 
     elif type_selected_option == "jobbtitel":
         valid_occupation_names_dict = {}
@@ -195,14 +204,15 @@ if selected_option:
             related_fields_names = []
             for f in related_fields:
                 related_fields_names.append(data_occupations[f].showname)
-            related_fields_str = " & ".join(related_fields_names)
+            related_fields_str = "<br />".join(related_fields_names)
             related_groups = data_occupations[selected_option_above_title_id].related_occupation_groups
             related_groups_names = []
             for g in related_groups:
                 related_groups_names.append(data_occupations[g].showname)
-            related_groups_str = " & ".join(related_groups_names)
-            description = descriptions.get(selected_option_above_title_id)      
-            show_info_selected(related_fields_str, related_groups_str, data_occupations[selected_option_above_title_id].showname, data_occupations[id_selected_option].showname, description)
+            related_groups_str = "<br />".join(related_groups_names)
+            description = descriptions.get(selected_option_above_title_id)  
+            related_taxonomy = taxonomy_connections.get(selected_option_above_title_id)    
+            show_info_selected(related_fields_str, related_groups_str, data_occupations[selected_option_above_title_id].showname, data_occupations[id_selected_option].showname, description, related_taxonomy)
         
     elif type_selected_option == "yrkesbenämning":
         id = valid_options_dict.get(selected_option)
@@ -211,11 +221,12 @@ if selected_option:
         related_fields_names = []
         for f in related_fields:
             related_fields_names.append(data_occupations[f].showname)
-        related_fields_str = " & ".join(related_fields_names)
+        related_fields_str = "<br />".join(related_fields_names)
         related_groups = data_occupations[id].related_occupation_groups
         related_groups_names = []
         for g in related_groups:
             related_groups_names.append(data_occupations[g].showname)
-        related_groups_str = " & ".join(related_groups_names)
+        related_groups_str = "<br />".join(related_groups_names)
         description = descriptions.get(id)
-        show_info_selected(related_fields_str, related_groups_str, name, None, description)   
+        related_taxonomy = taxonomy_connections.get(id)
+        show_info_selected(related_fields_str, related_groups_str, name, None, description, related_taxonomy)   
