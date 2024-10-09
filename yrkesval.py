@@ -53,6 +53,8 @@ def show_info_selected(description):
 def show_initial_information():
     st.logo("af-logotyp-rgb-540px.jpg")
     st.title("Yrkesväljare")
+    initial_text = "Vill du starta om tryck cmd + r"
+    st.markdown(f"<p style='font-size:12px;'>{initial_text}</p>", unsafe_allow_html=True)
 
 def change_state_chosen_background():
     st.session_state.chosen_background = False
