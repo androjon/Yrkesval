@@ -119,7 +119,6 @@ def choose_ssyk_level_4(field_id):
     if selected_ssyk_level_4:
         id_selected_ssyk_level_4 = ssyk_level_4_options.get(selected_ssyk_level_4)
         ssyk_level_4_definition = st.session_state.definitions.get(id_selected_ssyk_level_4)
-        show_info_selected(ssyk_level_4_definition)
         post_selected_ssyk_level_4(id_selected_ssyk_level_4)
 
 def choose_occupation_name(dict_valid_occupations):
