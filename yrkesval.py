@@ -17,9 +17,12 @@ def import_occupationdata():
     return ocupation_data
 
 @st.cache_data
-def import_options(input):
+def import_options():
     options_field, options_ssyk_level_4, options_occupations, options_titles = create_options(input)
-    return options_field, options_ssyk_level_4, options_occupations, options_titles
+    st.session_state.options_field = options_field
+    st.session_state.options_ssyk_level_4 = options_ssyk_level_4
+    st.session_state.options_occupations = options_occupations
+    st.session_state.options_titles = options_titles
 
 def show_info_selected_sidebar(fields, groups, occupation, description, taxonomy):
     with st.sidebar:
@@ -73,17 +76,18 @@ def initiate_session_state():
     if st.session_state.chosen_background == True:
         st.button("Lägga till fler yrkes- eller utbildningsbakgrunder", on_click = change_state_chosen_background)
 
+
 def create_valid_options(input, fields, groups, occupations, titles):
-    options_field, options_ssyk_level_4, options_occupations, options_titles = import_options(input)
+    import_options()
     output = {}
     if fields:
-        output = output | dict(sorted(options_field.items(), key = lambda item: item[0]))
+        output = output | dict(sorted(st.session_state.options_field.items(), key = lambda item: item[0]))
     if groups:
-        output = output | dict(sorted(options_ssyk_level_4.items(), key = lambda item: item[0]))
+        output = output | dict(sorted(st.session_state.options_ssyk_level_4.items(), key = lambda item: item[0]))
     if occupations:
-        output = output | dict(sorted(options_occupations.items(), key = lambda item: item[0]))
+        output = output | dict(sorted(st.session_state.options_occupations.items(), key = lambda item: item[0]))
     if titles:
-        output = output | dict(sorted(options_titles.items(), key = lambda item: item[0]))
+        output = output | dict(sorted(st.session_state.options_titles.items(), key = lambda item: item[0]))
     return output
 
 def post_selected_ssyk_level_4(id_ssyk_level_4):
