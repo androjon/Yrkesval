@@ -17,8 +17,11 @@ def import_occupationdata():
     return ocupation_data
 
 @st.cache_data
-def import_options():
-    options_field, options_ssyk_level_4, options_occupations, options_titles = create_options(input)
+def cache_data():
+    st.session_state.occupationdata = import_occupationdata()
+    st.session_state.definitions = import_data("id_definitions.json")
+    st.session_state.taxonomy = import_data("id_taxonomy.json")
+    options_field, options_ssyk_level_4, options_occupations, options_titles = create_options(st.session_state.occupationdata)
     st.session_state.options_field = options_field
     st.session_state.options_ssyk_level_4 = options_ssyk_level_4
     st.session_state.options_occupations = options_occupations
@@ -136,10 +139,6 @@ def choose_occupation_name(dict_valid_occupations):
         post_selected_occupation(id_selected_occupation)
         
 def choose_occupational_background():
-    st.session_state.occupationdata = import_occupationdata()
-    st.session_state.definitions = import_data("id_definitions.json")
-    st.session_state.taxonomy = import_data("id_taxonomy.json")
-
     col1, col2 = st.columns(2)
 
     with col1:
@@ -181,7 +180,7 @@ def choose_occupational_background():
 def main ():
     show_initial_information()
     initiate_session_state()
-    import_options()
+    cache_data()
     choose_occupational_background()
 
 if __name__ == '__main__':
