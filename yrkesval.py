@@ -78,7 +78,6 @@ def initiate_session_state():
 
 
 def create_valid_options(input, fields, groups, occupations, titles):
-    import_options()
     output = {}
     if fields:
         output = output | dict(sorted(st.session_state.options_field.items(), key = lambda item: item[0]))
@@ -182,6 +181,7 @@ def choose_occupational_background():
 def main ():
     show_initial_information()
     initiate_session_state()
+    import_options()
     choose_occupational_background()
 
 if __name__ == '__main__':
