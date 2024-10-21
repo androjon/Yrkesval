@@ -17,15 +17,15 @@ def import_occupationdata():
     return ocupation_data
 
 @st.cache_data
+def import_options():
+    options_field, options_ssyk_level_4, options_occupations, options_titles = create_options(st.session_state.occupationdata)
+    return options_field, options_ssyk_level_4, options_occupations, options_titles
+
 def cache_data():
     st.session_state.occupationdata = import_occupationdata()
     st.session_state.definitions = import_data("id_definitions.json")
     st.session_state.taxonomy = import_data("id_taxonomy.json")
-    options_field, options_ssyk_level_4, options_occupations, options_titles = create_options(st.session_state.occupationdata)
-    st.session_state.options_field = options_field
-    st.session_state.options_ssyk_level_4 = options_ssyk_level_4
-    st.session_state.options_occupations = options_occupations
-    st.session_state.options_titles = options_titles
+    st.session_state.options_field, st.session_state.options_ssyk_level_4, st.session_state.options_occupations, st.session_state.options_titles = import_options()
 
 def show_info_selected_sidebar(fields, groups, occupation, description, taxonomy):
     with st.sidebar:
